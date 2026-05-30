@@ -1,6 +1,4 @@
 node_modules/
-data/cultura.db
-data/images/
 .env
 .claude/
 CLAUDE.md
