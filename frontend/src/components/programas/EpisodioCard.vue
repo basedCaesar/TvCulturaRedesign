@@ -4,7 +4,16 @@
     @click="$router.push(`/programas/${programaId}/${episodio.id}`)"
   >
     <div class="aspect-video rounded-md overflow-hidden mb-3 relative">
-      <div :class="`w-full h-full bg-gradient-to-br ${episodio.gradient} flex items-center justify-center`">
+      <img
+        v-if="episodio.youtubeId"
+        :src="`https://img.youtube.com/vi/${episodio.youtubeId}/hqdefault.jpg`"
+        :alt="episodio.titulo"
+        class="w-full h-full object-cover"
+      />
+      <div
+        v-else
+        :class="`w-full h-full bg-gradient-to-br ${episodio.gradient} flex items-center justify-center`"
+      >
         <span class="font-display text-white/30 text-xs font-bold tracking-widest text-center px-3">
           {{ episodio.data }}
         </span>

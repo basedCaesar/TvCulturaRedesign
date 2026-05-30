@@ -1,0 +1,22 @@
+{
+  "name": "cultura-backend",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "scraper:full": "node src/scrapers/scraper-full.js",
+    "scraper:semanal": "node src/scrapers/scraper-semanal.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "better-sqlite3": "^9.6.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-cron": "^3.0.3",
+    "sharp": "^0.33.4",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

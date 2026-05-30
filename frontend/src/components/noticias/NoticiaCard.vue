@@ -1,15 +1,22 @@
 <template>
   <article
     class="group grid gap-0 bg-white border border-cultborder rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow grid-cols-1 sm:grid-cols-[340px_1fr]"
-    @click="$router.push(`/noticias/${noticia.id}`)"
+    @click="$router.push(`/noticias/${noticia.slug}`)"
     role="button"
     tabindex="0"
-    @keydown.enter="$router.push(`/noticias/${noticia.id}`)"
+    @keydown.enter="$router.push(`/noticias/${noticia.slug}`)"
     :aria-label="noticia.titulo"
   >
 
     <div class="relative overflow-hidden">
+      <img
+        v-if="noticia.imagem"
+        :src="noticia.imagem"
+        :alt="noticia.titulo"
+        class="w-full h-full min-h-[200px] object-cover transition-transform duration-500 group-hover:scale-105"
+      />
       <div
+        v-else
         :class="`w-full h-full min-h-[200px] bg-gradient-to-br ${noticia.gradient} transition-transform duration-500 group-hover:scale-105`"
       />
     </div>

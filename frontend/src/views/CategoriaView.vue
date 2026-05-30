@@ -73,12 +73,11 @@ const POR_PAGINA = 11
 const route = useRoute()
 
 const slugToCategoria = {
-  esporte: 'Esporte',
+  noticias:       'Notícias',
+  esporte:        'Esporte',
   entretenimento: 'Entretenimento',
-  educacao: 'Educação',
-  diversas: 'Diversas',
-  'estacao-cultura': 'Estação Cultura',
-  'jazz-sinfonica': 'Jazz Sinfônica',
+  economia:       'Economia',
+  receitas:       'Receitas',
 }
 
 const categoria = computed(() => slugToCategoria[route.params.slug] || '')

@@ -18,13 +18,16 @@
         v-for="item in noticias"
         :key="item.id"
         class="group cursor-pointer"
-        @click="$router.push(`/noticias/${item.id}`)"
+        @click="$router.push(`/noticias/${item.slug}`)"
         role="button"
         tabindex="0"
-        @keydown.enter="$router.push(`/noticias/${item.id}`)"
+        @keydown.enter="$router.push(`/noticias/${item.slug}`)"
         :aria-label="item.titulo"
       >
-        <div :class="`aspect-[3/2] rounded-md mb-3.5 bg-gradient-to-br ${item.gradient}`" />
+        <div class="aspect-[3/2] rounded-md mb-3.5 overflow-hidden">
+          <img v-if="item.imagem" :src="item.imagem" :alt="item.titulo" class="w-full h-full object-cover" />
+          <div v-else :class="`w-full h-full bg-gradient-to-br ${item.gradient}`" />
+        </div>
         <p class="text-[11px] font-semibold uppercase tracking-widest text-orange mb-1.5">{{ item.categoria }}</p>
         <h3 class="text-[15px] font-medium text-dark leading-snug group-hover:text-teal transition-colors">{{ item.titulo }}</h3>
       </article>

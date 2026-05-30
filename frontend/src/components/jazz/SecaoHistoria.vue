@@ -25,7 +25,6 @@
       <p class="text-sm text-muted text-center mb-12 uppercase tracking-widest">Mais de três décadas de história</p>
 
       <div class="relative">
-        <!-- Linha conectora -->
         <div class="hidden md:block absolute top-6 left-0 right-0 h-0.5 bg-cultborder" />
 
         <div class="grid md:grid-cols-4 gap-8">

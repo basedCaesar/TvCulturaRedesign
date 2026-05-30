@@ -52,7 +52,18 @@
       </button>
     </div>
 
-    <div class="flex flex-col gap-5">
+    <div v-if="loading && !gradeData" class="flex flex-col gap-5">
+      <SkeletonRow v-for="i in 6" :key="i" />
+    </div>
+
+    <div v-else-if="error && !gradeData" class="text-center py-20">
+      <p class="text-muted text-lg mb-4">{{ error }}</p>
+      <button @click="carregarGrade" class="text-teal text-sm font-semibold hover:underline">
+        Tentar novamente
+      </button>
+    </div>
+
+    <div v-else class="flex flex-col gap-5 transition-opacity duration-150" :class="{ 'opacity-40': loading }">
       <GradeCard
         v-for="item in gradeExibida"
         :key="item.horario + item.nome"
@@ -64,25 +75,42 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getGradeParaDia, getDiasNav } from '@/composables/useGrade.js'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { fetchGradeParaDia, getDiasNav } from '@/composables/useGrade.js'
+import { useAsync } from '@/composables/useAsync.js'
+import { api } from '@/api/cultura.js'
 import GradeCard from '@/components/grade/GradeCard.vue'
+import SkeletonRow from '@/components/ui/SkeletonRow.vue'
 
-const diasNav = getDiasNav()
-const todayIndex = diasNav.findIndex(d => d.isToday)
+const todosOsDias = getDiasNav()
+const datasDisponiveis = ref(null)
 
-const hoje = diasNav[todayIndex]
-const diaSelecionado = ref(hoje)
+const diasNav = computed(() => {
+  if (!datasDisponiveis.value) return todosOsDias
+  const set = new Set(datasDisponiveis.value)
+  return todosOsDias.filter(d => set.has(d.key))
+})
 
+const todayIndex = computed(() => diasNav.value.findIndex(d => d.isToday))
+const diaSelecionado = ref(todosOsDias.find(d => d.isToday) ?? todosOsDias[10])
 const isMobile = ref(false)
 
 function checkMobile() {
   isMobile.value = window.innerWidth < 640
 }
 
-onMounted(() => {
+onMounted(async () => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
+  try {
+    const res = await api.gradeDatasDisponiveis()
+    datasDisponiveis.value = res.datas
+    if (!diasNav.value.find(d => d.key === diaSelecionado.value?.key)) {
+      const hoje = diasNav.value.find(d => d.isToday)
+      diaSelecionado.value = hoje ?? diasNav.value[0]
+    }
+  } catch {
+  }
 })
 
 onUnmounted(() => {
@@ -90,22 +118,23 @@ onUnmounted(() => {
 })
 
 const diasVisiveis = computed(() => {
+  const nav = diasNav.value
   const janela = isMobile.value ? 3 : 9
   const half = Math.floor(janela / 2)
-  const idx = diasNav.findIndex(d => d.key === diaSelecionado.value?.key)
-  const center = idx >= 0 ? idx : todayIndex
-  const start = Math.max(0, Math.min(center - half, diasNav.length - janela))
-  return diasNav.slice(start, start + janela)
+  const idx = nav.findIndex(d => d.key === diaSelecionado.value?.key)
+  const center = idx >= 0 ? idx : todayIndex.value
+  const start = Math.max(0, Math.min(center - half, nav.length - janela))
+  return nav.slice(start, start + janela)
 })
 
 const podeAnterior = computed(() => {
-  const idx = diasNav.findIndex(d => d.key === diaSelecionado.value?.key)
+  const idx = diasNav.value.findIndex(d => d.key === diaSelecionado.value?.key)
   return idx > 0
 })
 
 const podePróximo = computed(() => {
-  const idx = diasNav.findIndex(d => d.key === diaSelecionado.value?.key)
-  return idx < diasNav.length - 1
+  const idx = diasNav.value.findIndex(d => d.key === diaSelecionado.value?.key)
+  return idx < diasNav.value.length - 1
 })
 
 function selecionarDia(dia) {
@@ -113,13 +142,21 @@ function selecionarDia(dia) {
 }
 
 function navDia(dir) {
-  const idx = diasNav.findIndex(d => d.key === diaSelecionado.value?.key)
-  const novoIdx = Math.max(0, Math.min(idx + dir, diasNav.length - 1))
-  diaSelecionado.value = diasNav[novoIdx]
+  const nav = diasNav.value
+  const idx = nav.findIndex(d => d.key === diaSelecionado.value?.key)
+  const novoIdx = Math.max(0, Math.min(idx + dir, nav.length - 1))
+  diaSelecionado.value = nav[novoIdx]
 }
 
+const { loading, error, data: gradeData, execute: carregarGrade } = useAsync(
+  () => fetchGradeParaDia(diaSelecionado.value?.key ?? null)
+)
+
+watch(diaSelecionado, () => carregarGrade(), { immediate: true })
+
 const gradeExibida = computed(() => {
-  const grade = getGradeParaDia(diaSelecionado.value?.date ?? new Date())
+  if (!gradeData.value) return []
+  const grade = gradeData.value
   const isToday = diaSelecionado.value?.isToday ?? false
 
   if (!isToday) return grade

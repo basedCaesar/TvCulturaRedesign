@@ -25,13 +25,11 @@
 
   <div v-else-if="programa" class="max-w-6xl mx-auto px-6 py-12">
 
-    <!-- Voltar -->
     <button @click="voltar" class="text-teal text-sm font-semibold hover:underline mb-8 inline-block">
       ← Voltar
     </button>
 
     <div class="grid md:grid-cols-2 gap-8 mb-16">
-      <!-- Info -->
       <div class="flex flex-col justify-center">
         <h1 class="font-display text-4xl font-bold text-teal uppercase mb-4">{{ programa.nome }}</h1>
         <span class="inline-block self-start text-[10px] font-bold uppercase tracking-widest text-orange bg-orange/10 px-3 py-1 rounded mb-6">
@@ -40,8 +38,14 @@
         <p class="text-mid text-base leading-relaxed">{{ programa.descricaoLonga }}</p>
       </div>
 
-      <div :class="`aspect-video rounded-xl bg-gradient-to-br ${programa.gradient} flex items-center justify-center`">
-        <span class="font-display text-white/40 text-2xl font-bold tracking-widest text-center px-6">
+      <div :class="`aspect-video rounded-xl overflow-hidden bg-gradient-to-br ${programa.gradient} flex items-center justify-center`">
+        <img
+          v-if="programa.imagem"
+          :src="programa.imagem"
+          :alt="programa.nome"
+          class="w-full h-full object-cover"
+        />
+        <span v-else class="font-display text-white/40 text-2xl font-bold tracking-widest text-center px-6">
           {{ programa.nome.toUpperCase() }}
         </span>
       </div>
@@ -57,7 +61,7 @@
         v-for="ep in episodiosPaginados"
         :key="ep.id"
         :episodio="ep"
-        :programa-id="programa.id"
+        :programa-id="programa.slug"
       />
     </div>
 

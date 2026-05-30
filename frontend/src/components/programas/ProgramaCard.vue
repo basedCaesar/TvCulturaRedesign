@@ -1,10 +1,17 @@
 <template>
   <article
     class="group cursor-pointer"
-    @click="$router.push(`/programas/${programa.id}`)"
+    @click="$router.push(`/programas/${programa.slug}`)"
   >
     <div class="aspect-video rounded-lg overflow-hidden mb-4">
+      <img
+        v-if="programa.imagem"
+        :src="programa.imagem"
+        :alt="programa.nome"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
       <div
+        v-else
         :class="`w-full h-full bg-gradient-to-br ${programa.gradient} flex items-center justify-center`"
       >
         <span class="font-display text-white/40 text-lg font-bold tracking-widest text-center px-4">

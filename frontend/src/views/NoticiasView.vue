@@ -7,7 +7,6 @@
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6 mb-8">
-      <!-- Chips de categoria -->
       <div class="flex flex-wrap gap-2">
         <button
           v-for="cat in categorias"

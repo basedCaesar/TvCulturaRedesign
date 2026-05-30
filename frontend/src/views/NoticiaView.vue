@@ -27,11 +27,24 @@
       </div>
       <h1 class="font-display text-4xl font-bold text-dark leading-tight mb-4">{{ noticia.titulo }}</h1>
       <p class="text-muted text-sm mb-8">{{ noticia.tempo }}</p>
-      <div :class="`w-full aspect-video rounded-xl mb-8 bg-gradient-to-br ${noticia.gradient}`" />
-      <p class="text-mid text-lg leading-relaxed">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
+      <div :class="`w-full aspect-video rounded-xl mb-8 bg-gradient-to-br ${noticia.gradient} overflow-hidden`">
+        <img
+          v-if="noticia.imagem"
+          :src="noticia.imagem"
+          :alt="noticia.titulo"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="prose-noticia">
+        <template v-if="noticia.paragrafos?.length">
+          <p
+            v-for="(p, i) in noticia.paragrafos"
+            :key="i"
+            class="text-mid text-lg leading-relaxed mb-5 last:mb-0"
+          >{{ p }}</p>
+        </template>
+        <p v-else class="text-mid text-lg leading-relaxed">{{ noticia.descricao }}</p>
+      </div>
     </div>
 
   </div>

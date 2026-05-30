@@ -10,9 +10,17 @@
       item.programaId ? 'cursor-pointer' : '',
     ]"
   >
-    <div class="relative overflow-hidden">
+    <div class="relative overflow-hidden min-h-[140px]">
+      <img
+        v-if="item.imagem"
+        :src="imgUrl(item.imagem)"
+        :alt="item.nome"
+        class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        @error="e => e.target.style.display = 'none'"
+      />
       <div
-        :class="`w-full h-full min-h-[140px] bg-gradient-to-br ${item.gradient} transition-transform duration-500 group-hover:scale-105`"
+        v-else
+        :class="`absolute inset-0 bg-gradient-to-br ${item.gradient} transition-transform duration-500 group-hover:scale-105`"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
       <span
@@ -57,6 +65,8 @@
 </template>
 
 <script setup>
+import { imgUrl } from '@/api/cultura.js'
+
 defineProps({
   item: {
     type: Object,

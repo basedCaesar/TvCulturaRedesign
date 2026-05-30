@@ -6,7 +6,7 @@
     </div>
 
     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-      <SkeletonCard v-for="i in 3" :key="i" />
+      <SkeletonCard v-for="i in 6" :key="i" />
     </div>
 
     <div v-else-if="error" class="text-center py-10">
@@ -18,13 +18,16 @@
         v-for="item in destaques"
         :key="item.id"
         class="group cursor-pointer"
-        @click="$router.push(`/noticias/${item.id}`)"
+        @click="$router.push(`/noticias/${item.slug}`)"
         role="button"
         tabindex="0"
-        @keydown.enter="$router.push(`/noticias/${item.id}`)"
+        @keydown.enter="$router.push(`/noticias/${item.slug}`)"
         :aria-label="item.titulo"
       >
-        <div :class="`aspect-video rounded-lg overflow-hidden mb-4 relative bg-gradient-to-br ${item.gradient}`" />
+        <div class="aspect-video rounded-lg overflow-hidden mb-4 relative">
+          <img v-if="item.imagem" :src="item.imagem" :alt="item.titulo" class="w-full h-full object-cover" />
+          <div v-else :class="`w-full h-full bg-gradient-to-br ${item.gradient}`" />
+        </div>
         <p class="card-category">{{ item.categoria }}</p>
         <h3 class="card-title mb-2 group-hover:text-teal transition-colors">{{ item.titulo }}</h3>
         <span class="text-xs text-muted">{{ item.tempo }}</span>
@@ -42,5 +45,5 @@ import SkeletonCard from '@/components/ui/SkeletonCard.vue'
 const { loading, error, data, execute } = useAsync(fetchDestaques)
 onMounted(() => execute())
 
-const destaques = computed(() => data.value?.filter(n => !n.hero) ?? [])
+const destaques = computed(() => data.value?.slice(0, 6) ?? [])
 </script>
