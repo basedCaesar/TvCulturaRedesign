@@ -71,6 +71,7 @@ function runMigrations() {
   `);
 
   try { db.exec('ALTER TABLE noticias ADD COLUMN categoria TEXT'); } catch (_) {}
+  try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_episodios_url ON episodios(url_original)'); } catch (_) {}
 }
 
 module.exports = { runMigrations };

@@ -62,8 +62,8 @@ async function scrapePrograma(slug) {
     slug;
 
   const descricao =
+    $('#content-programa #info-programa p').first().text().trim() ||
     $('meta[property="og:description"]').attr('content') ||
-    $('[class*="descricao"], [class*="sinopse"], [class*="sobre"] p').first().text().trim() ||
     null;
 
   const bodyClass = ($('body').attr('class') || '') + ' ' + ($('main, #main, [role="main"]').attr('class') || '');
@@ -107,14 +107,22 @@ async function scrapeEpisode(url) {
   const $ = cheerio.load(data);
 
   const titulo =
-    $('h1').first().text().trim() ||
     $('meta[property="og:title"]').attr('content') ||
+    $('aside h2').first().text().trim() ||
     null;
 
-  const descricao =
-    $('meta[property="og:description"]').attr('content') ||
-    $('article p, .descricao, .sinopse').first().text().trim() ||
-    null;
+  const descricao = $('article p').filter((_, el) => {
+    return $(el).find('figure, iframe').length === 0 && $(el).text().trim().length > 20
+  }).first().text().trim() || null;
+
+  let data_episodio = null;
+  try {
+    const jsonLd = $('script[type="application/ld+json"]').first().html()
+    if (jsonLd) {
+      const parsed = JSON.parse(jsonLd)
+      if (parsed.datePublished) data_episodio = new Date(parsed.datePublished).toISOString()
+    }
+  } catch (_) {}
 
   let youtube_id = null;
   $('iframe').each((_, el) => {
@@ -129,7 +137,7 @@ async function scrapeEpisode(url) {
     if (match) youtube_id = match[1];
   }
 
-  return { titulo, descricao, youtube_id, url_original: url };
+  return { titulo, descricao, data_episodio, youtube_id, url_original: url };
 }
 
 function titleToSlug(title) {
@@ -227,8 +235,13 @@ const insertPrograma = db.prepare(`
 `);
 
 const insertEpisodio = db.prepare(`
-  INSERT OR IGNORE INTO episodios (programa_id, titulo, descricao, youtube_id, url_original)
-  VALUES (@programa_id, @titulo, @descricao, @youtube_id, @url_original)
+  INSERT INTO episodios (programa_id, titulo, descricao, youtube_id, url_original, data_episodio)
+  VALUES (@programa_id, @titulo, @descricao, @youtube_id, @url_original, @data_episodio)
+  ON CONFLICT(url_original) DO UPDATE SET
+    descricao     = COALESCE(excluded.descricao, descricao),
+    youtube_id    = COALESCE(excluded.youtube_id, youtube_id),
+    titulo        = COALESCE(excluded.titulo, titulo),
+    data_episodio = COALESCE(excluded.data_episodio, data_episodio)
 `);
 
 const getProgramaBySlug = db.prepare('SELECT id FROM programas WHERE slug = ?');
@@ -277,14 +290,6 @@ async function main() {
 
     const result = insertPrograma.run({ ...prog, slug, imagem_local });
     const programa_id = result.lastInsertRowid || getProgramaBySlug.get(slug)?.id;
-
-    const jaTemEpisodios = db.prepare('SELECT COUNT(*) as n FROM episodios WHERE programa_id = ?').get(programa_id)?.n > 0;
-    if (jaTemEpisodios) {
-      console.log(`[FULL] Episódios já existem, pulando`);
-      totalPrograms++;
-      if (i < PROGRAM_SLUGS.length - 1) await sleep(DELAY);
-      continue;
-    }
 
     try {
       await sleep(DELAY);
