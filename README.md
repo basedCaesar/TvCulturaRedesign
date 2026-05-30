@@ -50,4 +50,4 @@ docker-compose up --build
 
 ## Deploy
 
-> **Live:** _link quando estiver no ar_
+> **Live:** https://tv-cultura-redesign.vercel.app
