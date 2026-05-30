@@ -81,11 +81,17 @@ async function scrapeArticle(url) {
     $('meta[property="og:title"]').attr('content') ||
     null;
 
-  const conteudo = $('article p, .conteudo p, .texto p, .corpo p, [class*="content"] p')
-    .map((_, p) => $(p).text().trim())
-    .get()
-    .filter(t => t.length > 20)
-    .join('\n\n') || null;
+  const SELECTORS = ['article', '.conteudo', '.texto', '.corpo', '[class*="content"]']
+  let container = null
+  for (const sel of SELECTORS) {
+    const el = $(sel).first()
+    if (el.length && el.text().trim().length > 100) { container = el; break }
+  }
+  let conteudo = null
+  if (container) {
+    container.find('script, style, nav, footer, aside, .tags, .relacionadas, .leia-tambem, .leia-mais, [class*="relacionad"], [class*="compartilh"], [class*="social"]').remove()
+    conteudo = container.html()?.trim() || null
+  }
 
   const imagem_url =
     $('meta[property="og:image"]').attr('content') ||

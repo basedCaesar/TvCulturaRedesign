@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import { api, imgUrl } from '@/api/cultura.js'
 
 export const categorias = [
@@ -48,13 +49,9 @@ function formatTempo(iso) {
   return `Há ${d} dia${d > 1 ? 's' : ''}`
 }
 
-function cleanConteudo(raw) {
+function sanitizeHtml(raw) {
   if (!raw) return null
-  return raw
-    .split('\n\n')
-    .map(p => p.trim())
-    .filter(p => p.length > 0 && !/^leia (também|mais)[:\s]/i.test(p))
-    .join('\n\n')
+  return DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } })
 }
 
 function normalize(n, idx) {
@@ -68,8 +65,7 @@ function normalize(n, idx) {
     tempo: formatTempo(n.publicado_em),
     gradient: gradients[idx % gradients.length],
     imagem: imgUrl(n.imagem_local) || n.imagem_url || null,
-    conteudo: cleanConteudo(n.conteudo),
-    paragrafos: cleanConteudo(n.conteudo)?.split('\n\n') ?? [],
+    conteudoHtml: sanitizeHtml(n.conteudo),
   }
 }
 
