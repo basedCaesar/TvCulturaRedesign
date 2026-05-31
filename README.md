@@ -13,18 +13,18 @@ Redesign de portfólio da [TV Cultura](https://cultura.uol.com.br), com dados re
 **Pré-requisitos:** Node.js 20+, npm
 
 ```bash
-git clone <repo-url>
-cd cultura
+git clone https://github.com/basedCaesar/TvCulturaRedesign
+cd TvCulturaRedesign
 
 # Backend
 cd backend
-cp .env.example .env        # ajuste se necessário
 npm install
 npm start                   # http://localhost:3000
 
 # Frontend (novo terminal)
 cd frontend
-cp .env.example .env        # VITE_API_URL=http://localhost:3000
+cp .env.example .env (Se estiver no Powershell)  # VITE_API_URL=http://localhost:3000
+copy .env.example .env (Se estiver no CMD)       # VITE_API_URL=http://localhost:3000
 npm install
 npm run dev                 # http://localhost:5173
 ```
@@ -36,8 +36,8 @@ npm run dev                 # http://localhost:5173
 **Pré-requisitos:** Docker, Docker Compose
 
 ```bash
-git clone <repo-url>
-cd cultura
+git clone https://github.com/basedCaesar/TvCulturaRedesign
+cd TvCulturaRedesign
 docker-compose up --build
 ```
 
