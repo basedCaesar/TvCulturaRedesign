@@ -119,6 +119,7 @@ async function scrapeGrade() {
       const { data } = await http.get(url);
       const $ = cheerio.load(data);
 
+      db.prepare('DELETE FROM grade WHERE data = ?').run(dbDate);
       let count = 0;
 
       $('section.grade-box').each((_, el) => {

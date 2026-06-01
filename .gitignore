@@ -4,3 +4,5 @@ dist/
 .DS_Store
 .claude/
 CLAUDE.md
+*.db-shm
+*.db-wal
