@@ -19,12 +19,12 @@ const DIAS_SEMANA_FULL = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-fe
 const MESES            = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
 const MESES_ABREV      = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
-export function getDataFormatada(date = new Date()) {
+export function getDataFormatada(date = getBroadcastDate()) {
   return `${DIAS_SEMANA_FULL[date.getDay()]}, ${date.getDate()} de ${MESES[date.getMonth()]}`
 }
 
 export function getDiasNav() {
-  const hoje = new Date()
+  const hoje = getBroadcastDate()
   hoje.setHours(0, 0, 0, 0)
   return Array.from({ length: 21 }, (_, i) => {
     const d = new Date(hoje)
@@ -82,12 +82,22 @@ function currentBroadcastMin() {
   return cal < 300 ? cal + 1440 - 300 : cal - 300
 }
 
+function getBroadcastDate() {
+  const now = new Date()
+  if (now.getHours() < 5) {
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    return yesterday
+  }
+  return now
+}
+
 function localDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 export async function fetchAgendaProxima() {
-  const todayStr = localDateStr()
+  const todayStr = localDateStr(getBroadcastDate())
   const items = await fetchGradeParaDia(todayStr)
   const curMin = currentBroadcastMin()
   let nowIdx = 0
